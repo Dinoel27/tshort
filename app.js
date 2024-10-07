@@ -25,22 +25,23 @@ const init = () => {
     // Add cube to the scene
     scene.add(cube);
     
-    // Set up AR session on button click
+    // Set up AR session if supported
     const arButton = document.getElementById('ar-button');
-    arButton.addEventListener('click', () => {
-        navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
-            if (supported) {
-                renderer.xr.setSession(navigator.xr.requestSession('immersive-ar', { requiredFeatures: ['hit-test'] }));
-                document.getElementById('ar-button').style.display = 'none';
-            } else {
-                alert('AR not supported on this device.');
-            }
+    if (navigator.xr) {
+        arButton.addEventListener('click', () => {
+            navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
+                if (supported) {
+                    renderer.xr.setSession(navigator.xr.requestSession('immersive-ar', { requiredFeatures: ['hit-test'] }));
+                    document.getElementById('ar-button').style.display = 'none';
+                } else {
+                    alert('AR not supported on this device.');
+                }
+            });
         });
-    });
-
-    // Set up AR controller
-    const controller = renderer.xr.getController(0);
-    scene.add(controller);
+    } else {
+        arButton.innerHTML = 'AR not supported in this browser';
+        arButton.disabled = true;
+    }
     
     // Start rendering
     renderer.setAnimationLoop(render);
